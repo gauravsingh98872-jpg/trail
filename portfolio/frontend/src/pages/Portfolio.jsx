@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import './Portfolio.css';
 
-const API = process.env.REACT_APP_API_URL ||'https://trail-tpcd.onrender.com';
+const API = process.env.REACT_APP_API_URL || 'https://trail-tpcd.onrender.com';
 
 // ─── Scroll Reveal Hook ───────────────────────────────────────────────────────
 function useScrollReveal(options = {}) {
