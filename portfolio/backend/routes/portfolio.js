@@ -3,48 +3,75 @@ const router = express.Router();
 const Portfolio = require('../models/Portfolio');
 const auth = require('../middleware/auth');
 
-// Default empty portfolio structure
+// ✅ Default portfolio structure
 const defaultPortfolio = {
-  name: '', title: '', location: '', phone: '', email: '', summary: '',
+  name: '',
+  title: '',
+  location: '',
+  phone: '',
+  email: '',
+  summary: '',
   skills: [],
-  education: [], 
+  education: [],
   projects: [],
   certificates: [],
   languages: [],
   hobbies: []
 };
 
-// GET /api/portfolio - public
+// ✅ GET /api/portfolio (PUBLIC)
 router.get('/', async (req, res) => {
   try {
     let portfolio = await Portfolio.findOne();
 
-    // ✅ FIX: Agar DB mein kuch nahi hai toh create karo
     if (!portfolio) {
+      console.log('⚠️ No portfolio found → creating default');
       portfolio = await Portfolio.create(defaultPortfolio);
     }
 
-    res.json(portfolio);
+    res.status(200).json(portfolio);
+
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('🔥 GET /portfolio error:', err);
+    res.status(500).json({
+      message: 'Server error',
+      error: err.message   // ✅ actual error show karega
+    });
   }
 });
 
-// PUT /api/portfolio - protected (admin only)
+// ✅ PUT /api/portfolio (PROTECTED)
 router.put('/', auth, async (req, res) => {
   try {
     let portfolio = await Portfolio.findOne();
 
-    // ✅ FIX: Agar exist nahi karta toh create karo
     if (!portfolio) {
+      console.log('⚠️ No portfolio found → creating default');
       portfolio = await Portfolio.create(defaultPortfolio);
     }
 
-    Object.assign(portfolio, req.body);
+    // ✅ Only allowed fields update kare
+    const allowedFields = [
+      'name', 'title', 'location', 'phone', 'email', 'summary',
+      'skills', 'education', 'projects', 'certificates', 'languages', 'hobbies'
+    ];
+
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        portfolio[field] = req.body[field];
+      }
+    });
+
     await portfolio.save();
-    res.json(portfolio);
+
+    res.status(200).json(portfolio);
+
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('🔥 PUT /portfolio error:', err);
+    res.status(500).json({
+      message: 'Server error',
+      error: err.message   // ✅ debug ke liye
+    });
   }
 });
 
