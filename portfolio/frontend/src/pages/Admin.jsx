@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Admin.css';
 
-const API = '/api/portfolio';
+const API = `${process.env.REACT_APP_API_URL}/api/portfolio`;
 
 const tabs = [
   { id: 'info',         label: 'Info',        icon: '👤' },

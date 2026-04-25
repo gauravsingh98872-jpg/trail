@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post('/api/auth/login', form);
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, form);
       login(res.data.token, res.data.username);
       navigate('/admin');
     } catch (err) {
