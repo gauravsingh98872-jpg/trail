@@ -3,75 +3,48 @@ const router = express.Router();
 const Portfolio = require('../models/Portfolio');
 const auth = require('../middleware/auth');
 
-// ✅ Default portfolio structure
+// Default empty portfolio structure
 const defaultPortfolio = {
-  name: '',
-  title: '',
-  location: '',
-  phone: '',
-  email: '',
-  summary: '',
+  name: '', title: '', location: '', phone: '', email: '', summary: '',
   skills: [],
-  education: [],
+  education: [], 
   projects: [],
   certificates: [],
   languages: [],
   hobbies: []
 };
 
-// ✅ GET /api/portfolio (PUBLIC)
+// GET /api/portfolio - public
 router.get('/', async (req, res) => {
   try {
     let portfolio = await Portfolio.findOne();
 
+    // ✅ FIX: Agar DB mein kuch nahi hai toh create karo
     if (!portfolio) {
-      console.log('⚠️ No portfolio found → creating default');
       portfolio = await Portfolio.create(defaultPortfolio);
     }
 
-    res.status(200).json(portfolio);
-
+    res.json(portfolio);
   } catch (err) {
-    console.error('🔥 GET /portfolio error:', err);
-    res.status(500).json({
-      message: 'Server error',
-      error: err.message   // ✅ actual error show karega
-    });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// ✅ PUT /api/portfolio (PROTECTED)
+// PUT /api/portfolio - protected (admin only)
 router.put('/', auth, async (req, res) => {
   try {
     let portfolio = await Portfolio.findOne();
 
+    // ✅ FIX: Agar exist nahi karta toh create karo
     if (!portfolio) {
-      console.log('⚠️ No portfolio found → creating default');
       portfolio = await Portfolio.create(defaultPortfolio);
     }
 
-    // ✅ Only allowed fields update kare
-    const allowedFields = [
-      'name', 'title', 'location', 'phone', 'email', 'summary',
-      'skills', 'education', 'projects', 'certificates', 'languages', 'hobbies'
-    ];
-
-    allowedFields.forEach(field => {
-      if (req.body[field] !== undefined) {
-        portfolio[field] = req.body[field];
-      }
-    });
-
+    Object.assign(portfolio, req.body);
     await portfolio.save();
-
-    res.status(200).json(portfolio);
-
+    res.json(portfolio);
   } catch (err) {
-    console.error('🔥 PUT /portfolio error:', err);
-    res.status(500).json({
-      message: 'Server error',
-      error: err.message   // ✅ debug ke liye
-    });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
