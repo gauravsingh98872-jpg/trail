@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import './Admin.css';
 
 const API = `${process.env.REACT_APP_API_URL}/api/portfolio`;
+const MESSAGES_API = `${process.env.REACT_APP_API_URL}/api/messages`;
 
 const tabs = [
   { id: 'info',         label: 'Info',        icon: '👤' },
@@ -47,7 +48,7 @@ export default function Admin() {
     }).catch(err => { console.error('API Error:', err); setLoading(false); });
 
     if (token) {
-      axios.get('/api/messages', { headers: { Authorization: `Bearer ${token}` } })
+      axios.get(MESSAGES_API, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => setMessages(Array.isArray(r.data) ? r.data : []))
         .catch(err => console.error('Messages Error:', err.response?.status));
     }
